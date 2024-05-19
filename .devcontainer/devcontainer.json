@@ -1,0 +1,62 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+{
+  "name": "aws-landingzone",
+  "build": {
+    "dockerfile": "dockerfile",
+    "context": ".."
+  },
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  // "features": {
+  //   "ghcr.io/devcontainers/features/node:1": {
+  //     "version": "20"
+  //   }
+  // },
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  //   "forwardPorts": [3000],
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // "postCreateCommand": "pnpm config set store-dir /home/node/.pnpm-store",
+  // "postStartCommand": {
+  //   // "store": "pnpm config set store-dir /home/node/.pnpm-store"
+  //   "installApp": "cd app && pnpm install",
+  //   "installCdk": "cd infrastructure && pnpm install"
+  // },
+  // Configure tool-specific properties.
+  "postCreateCommand": "pnpm config set store-dir /home/node/.pnpm-store",
+
+  "customizations": {
+    // Configure properties specific to VS Code.
+    "vscode": {
+      // Add the IDs of extensions you want installed when the container is created.
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "hbenl.vscode-test-explorer",
+        "kavod-io.vscode-jest-test-adapter",
+        "orta.vscode-jest",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/bin/zsh"
+          }
+        },
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "typescript.tsdk": "node_modules/typescript/lib"
+      }
+    }
+  },
+  "containerEnv": {
+    "STARSHIP_CONFIG": "/home/node/.starship.toml",
+    "AWS_PROFILE": "pexon"
+  },
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.zsh_history,target=/home/node/.zsh_history,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.zshrc,target=/home/node/.zshrc,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.config/starship.toml,target=/home/node/.starship.toml,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.aws,target=/home/node/.aws,type=bind,consistency=cached"
+  ],
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  "remoteUser": "node"
+}
