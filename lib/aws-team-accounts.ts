@@ -2,7 +2,7 @@ import * as cdk from 'aws-cdk-lib'
 import { Construct } from 'constructs'
 
 import * as budgets from 'aws-cdk-lib/aws-budgets'
-import { OrganizationalUnit } from './constructs'
+import { Account, OrganizationalUnit } from './constructs'
 
 interface AwsTeamAccountNestedStackProps extends cdk.NestedStackProps {
   ouAwsTeams: OrganizationalUnit

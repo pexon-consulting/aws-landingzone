@@ -4,10 +4,15 @@ import { Construct } from 'constructs'
 import * as organizations from 'aws-cdk-lib/aws-organizations'
 import { Account, OrganizationalUnit, OrganizationsScpPolicy } from './constructs'
 import { AwsTeamAccountNestedStack } from './aws-team-accounts'
+import { OidcProvider } from './oidc-provider'
+import { GithubCicdRole } from './identities'
 
 export class AwsLandingzoneStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props)
+
+    const { openIdConnectProvider: oidcProvider } = new OidcProvider(this, 'oidc-provider')
+    new GithubCicdRole(this, 'github-cicd-role', { oidcProvider })
 
     const orga = new organizations.CfnOrganization(this, 'pexon-root-orga', {})
     orga.applyRemovalPolicy(cdk.RemovalPolicy.RETAIN)
