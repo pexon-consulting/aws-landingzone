@@ -79,7 +79,11 @@ export class DataAiTeam extends cdk.NestedStack {
       })
     })
 
-    const devUser: string[] = [...prodUser]
+    const devUser: string[] = [
+      ...prodUser,
+      '33d4f882-50a1-703b-155d-96de29012f7c',
+      'c3646802-3041-702a-c891-71358f9ce16c',
+    ]
 
     devUser.forEach(userId => {
       new identitystore.CfnGroupMembership(this, `dev-group-membership-${userId}`, {
