@@ -83,6 +83,7 @@ export class DataAiTeam extends cdk.NestedStack {
       ...prodUser,
       '33d4f882-50a1-703b-155d-96de29012f7c',
       'c3646802-3041-702a-c891-71358f9ce16c',
+      '99672b9ab3-324c3529-ea23-4a76-8471-b04e433ed41a',
     ]
 
     devUser.forEach(userId => {
