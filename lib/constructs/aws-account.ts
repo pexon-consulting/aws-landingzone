@@ -14,6 +14,7 @@ export interface AccountProps {
 }
 export class Account extends Construct {
   public id: string
+  public accountName: string
   constructor(
     scope: Construct,
     id: string,
@@ -28,6 +29,7 @@ export class Account extends Construct {
       parentIds: [_id],
     })
     this.id = node.attrAccountId
+    this.accountName = node.accountName
     if (removal) {
       node.applyRemovalPolicy(cdk.RemovalPolicy.RETAIN)
     }

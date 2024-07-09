@@ -1,9 +1,9 @@
 import * as cdk from 'aws-cdk-lib'
 import { Construct } from 'constructs'
-import * as identitystore from 'aws-cdk-lib/aws-identitystore'
 import * as sso from 'aws-cdk-lib/aws-sso'
+import * as identitystore from 'aws-cdk-lib/aws-identitystore'
 
-import { Account, OrganizationalUnit } from './constructs'
+import { Account, AccountBudget, OrganizationalUnit } from './constructs'
 
 interface DataAiTeamProps extends cdk.NestedStackProps {
   rootId: string
@@ -11,6 +11,14 @@ interface DataAiTeamProps extends cdk.NestedStackProps {
   ssoId: string
   permissionSet: sso.CfnPermissionSet
 }
+
+const budgetMails = [
+  'phillip.pham@pexon-consulting.de',
+  'fabian.mirz@pexon-consulting.de',
+  'maximilian.haensel@pexon-consulting.de',
+  'constantin.budin@pexon-consulting.de',
+  'bijay.regmi@pexon-consulting.de',
+]
 
 export class DataAiTeam extends cdk.NestedStack {
   constructor(scope: Construct, id: string, props: DataAiTeamProps) {
@@ -92,6 +100,19 @@ export class DataAiTeam extends cdk.NestedStack {
         identityStoreId,
         memberId: { userId },
       })
+    })
+
+    new AccountBudget(this, 'dev-account-budget', {
+      teamName: 'team-data-and-ai',
+      account: devAccount,
+      budgetLimit: 600,
+      eMails: budgetMails,
+    })
+    new AccountBudget(this, 'prod-account-budget', {
+      teamName: 'team-data-and-ai',
+      account: prodAccount,
+      budgetLimit: 300,
+      eMails: budgetMails,
     })
   }
 }
