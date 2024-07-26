@@ -71,6 +71,20 @@ export class AwsLandingzoneStack extends cdk.Stack {
       ssoId: ssoId.value,
       identityStoreId: identityStoreId.value,
     })
+    new AwsTeamAccountNestedStack(this, 'pre-sales', {
+      ouAwsTeams,
+      teamName: 'pre-sales',
+      accountName: 'pre-sales',
+      eMail: 'pre-sales@pexon-consulting.de',
+      permissionSet,
+      userIds: [
+        '99672b9ab3-8f3cbe6e-9933-4271-af13-64d5eab85f88',
+        '99672b9ab3-59c6547b-3876-4f85-8402-5ac57a9d4398',
+        'f35428f2-c0d1-7012-b959-252b35191e84',
+      ],
+      ssoId: ssoId.value,
+      identityStoreId: identityStoreId.value,
+    })
 
     new DataAiTeam(this, 'data-ai-team', {
       rootId,
