@@ -114,7 +114,7 @@ export class AwsLandingzoneStack extends cdk.Stack {
     description: 'Secret used for the SCIM bearer token and tenant ID',
     });
 
-    const lambdaFunction = new lambda.Function(this, 'MyLambdaFunction', {
+    const lambdaFunction = new lambda.Function(this, 'personio-scim-connector', {
       runtime: lambda.Runtime.PROVIDED_AL2023,
       code: lambda.Code.fromAsset('lib/personio-connector-lambda'),
       handler: 'main',
