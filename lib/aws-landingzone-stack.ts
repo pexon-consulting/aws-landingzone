@@ -2,12 +2,15 @@ import * as cdk from 'aws-cdk-lib'
 import { Construct } from 'constructs'
 
 import * as sso from 'aws-cdk-lib/aws-sso'
+import * as lambda from '@aws-cdk/aws-lambda'
+import * as secretsmanager from '@aws-cdk/aws-secretsmanager'
 import * as organizations from 'aws-cdk-lib/aws-organizations'
 import { Account, OrganizationalUnit, OrganizationsScpPolicy, SsmParameterString } from './constructs'
 import { AwsTeamAccountNestedStack } from './aws-team-accounts'
 import { OidcProvider } from './oidc-provider'
 import { GithubCicdRole } from './identities'
 import { DataAiTeam } from './data-ai-team'
+
 
 export class AwsLandingzoneStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
