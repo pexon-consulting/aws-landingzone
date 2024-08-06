@@ -104,5 +104,22 @@ export class AwsLandingzoneStack extends cdk.Stack {
       email: 'databricks-poc@pexon-consulting.de',
       organizationalUnit: pexonConsultingOu,
     })
+
+    // Has to be filled manually afterwards, expected keys are 'token' & 'id'
+    const scimLambdaSecrets = new secretsmanager.Secret(this, 'ScimLambdaSecrets', {
+        secretName: 'personio-scim-lambda-secret',
+    description: 'Secret used for the SCIM bearer token and tenant ID',
+    });
+
+    const lambdaFunction = new lambda.Function(this, 'MyLambdaFunction', {
+      runtime: lambda.Runtime.GO_1_X,
+      code: lambda.Code.fromAsset('personio-connector-lambda'),
+      handler: 'main',
+      environment: {
+        PERSONIO_SCIM_LAMBDA_SECRETS: scimLambdaSecrets.secretArn,
+        AWS_TENANT_ID: 'kE3bd5b870f-c798-45d1-9b5b-3be0d84fbb8f',
+      },
+    });
+
   }
 }
