@@ -115,7 +115,7 @@ export class AwsLandingzoneStack extends cdk.Stack {
     });
 
     const lambdaFunction = new lambda.Function(this, 'MyLambdaFunction', {
-      runtime: lambda.Runtime.GO_1_X,
+      runtime: lambda.Runtime.PROVIDED_AL2023,
       code: lambda.Code.fromAsset('lib/personio-connector-lambda'),
       handler: 'main',
       environment: {
