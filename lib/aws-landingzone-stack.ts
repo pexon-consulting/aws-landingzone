@@ -116,7 +116,7 @@ export class AwsLandingzoneStack extends cdk.Stack {
 
     const lambdaFunction = new lambda.Function(this, 'MyLambdaFunction', {
       runtime: lambda.Runtime.GO_1_X,
-      code: lambda.Code.fromAsset('personio-connector-lambda'),
+      code: lambda.Code.fromAsset('lib/personio-connector-lambda'),
       handler: 'main',
       environment: {
         PERSONIO_SCIM_LAMBDA_SECRETS: scimLambdaSecrets.secretArn,
