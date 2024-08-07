@@ -70,7 +70,11 @@ export class AwsLandingzoneStack extends cdk.Stack {
       accountName: 'ou-team-sued-sora',
       eMail: 'sued-aws-sora@pexon-consulting.de',
       permissionSet,
-      userIds: ['99672b9ab3-07cedb79-95b3-47ab-85bf-8b333da8fa8c', '99672b9ab3-59c6547b-3876-4f85-8402-5ac57a9d4398'],
+      userIds: [
+        '99672b9ab3-07cedb79-95b3-47ab-85bf-8b333da8fa8c',
+        '99672b9ab3-59c6547b-3876-4f85-8402-5ac57a9d4398',
+        '13244862-d071-70d9-14f1-de816d6bb74c',
+      ],
       ssoId: ssoId.value,
       identityStoreId: identityStoreId.value,
     })
