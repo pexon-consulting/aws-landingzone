@@ -50,5 +50,5 @@ Compress-Archive -Path main -DestinationPath personio-connector-lambda.zip
 
 ### TODO
 Currently the Event the lambda receives is not yet clear, since the Make Integration is not yet implemented.  
-There could the changes to the Personio user struct required and a way to distinct between user deletion and creation needs to be implemented.  
+There could be the changes to the Personio user struct and a way to distinguish between user deletion and creation needs to be implemented.  
 Also Check for other Todos in the Code.  
