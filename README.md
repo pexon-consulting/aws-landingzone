@@ -20,15 +20,16 @@ The Connector for creating and deleting AWS Users via SCIM is part of this CDK s
 ### Setup
 ![workflow.png](images%2Fworkflow.png)
 
-This Lambda function performs the following actions based on the event it receives:
+The Event should be pretty close to the [Personio API](https://developer.personio.de/reference/get_company-employees-employee-id) and will be mapped to an SCIM User struct, [according to the AWS Docs](https://docs.aws.amazon.com/singlesignon/latest/developerguide/createuser.html)  
+This Lambda function performs the following actions based on the event it receives:  
 
-Create a user: Adds a new user to the SCIM API.
-Delete a user: Removes a user from the SCIM API.
+Create a user: Adds a new user to the SCIM API.  
+Delete a user: Removes a user from the SCIM API.  
 
 ### Secrets
 
 The CDK Setup will create a Lambda function and required Secrets in the AWS SecretsManager. The Key & Value still have
-to be filled manually afterwards.
+to be filled manually afterward.
 
 {  
 "token": "scim-bearer-token",  
@@ -46,3 +47,8 @@ cd personio-connector-lambda
 go build -o main  
 Compress-Archive -Path main -DestinationPath personio-connector-lambda.zip  
 ````
+
+### TODO
+Currently the Event the lambda receives is not yet clear, since the Make Integration is not yet implemented.  
+There could the changes to the Personio user struct required and a way to distinct between user deletion and creation needs to be implemented.  
+Also Check for other Todos in the Code.  

@@ -7,6 +7,7 @@ import (
     "net/http"
     "os"
     "bytes"
+    "time"
 
     "github.com/aws/aws-lambda-go/lambda"
     "github.com/aws/aws-sdk-go/aws"
@@ -14,45 +15,9 @@ import (
     "github.com/aws/aws-sdk-go/service/secretsmanager"
 )
 
-/*
-Sample Events for User Creation/Deletion //TODO Groups need to be added
-
-{
-    "action": "create",
-    "userName": "johndoe",
-    "givenName": "John",
-    "familyName": "Doe",
-    "email": "johndoe@example.com"
-}
-
-{
-    "action": "delete",
-    "email": "johndoe@example.com"
-}
-*/
-
-type User struct {
-    UserName string `json:"userName"`
-    Name     struct {
-        GivenName  string `json:"givenName"`
-        FamilyName string `json:"familyName"`
-    } `json:"name"`
-    Emails []struct {
-        Value   string `json:"value"`
-        Primary bool   `json:"primary"`
-    } `json:"emails"`
-    Schemas []string `json:"schemas"`
-}
-
-type Event struct {
-    Action     string `json:"action"`
-    UserName   string `json:"userName,omitempty"`
-    GivenName  string `json:"givenName,omitempty"`
-    FamilyName string `json:"familyName,omitempty"`
-    Email      string `json:"email"`
-}
-
+// TODO This Event has to be adjusted to a personio User later
 func handler(event Event) (string, error) {
+    scimUser := MapPersonioToSCIM(event)
     SecretsArn := os.Getenv("PERSONIO_SCIM_LAMBDA_SECRETS")
     tenantID, err := getSecret(SecretsArn, "id")
     if err != nil {
@@ -66,62 +31,50 @@ func handler(event Event) (string, error) {
 
     region := getRegion()
     scimURL := fmt.Sprintf("https://scim.%s.amazonaws.com/%s/scim/v2/Users", region, tenantID)
-    switch event.Action {
+    // TODO This still has to be implemented, depending on the event received from the make personio integration
+    switch scimUser.Action {
     case "create":
-        return createUser(scimURL, bearerToken, event)
+        return createUser(scimURL, bearerToken, scimUser)
     case "delete":
-        return deleteUser(scimURL, bearerToken, event.Email)
+        return deleteUser(scimURL, bearerToken, scimUser.Email)
     default:
-        return "", fmt.Errorf("unknown action: %s", event.Action)
+        return "", fmt.Errorf("unknown action: %s", scimUser.Action)
     }
 }
 
-func createUser(scimURL, bearerToken string, event Event) (string, error) {
-    user := User{
-        UserName: event.UserName,
-        Schemas:  []string{"urn:ietf:params:scim:schemas:core:2.0:User"},
-    }
-    user.Name.GivenName = event.GivenName
-    user.Name.FamilyName = event.FamilyName
-    user.Emails = []struct {
-        Value   string `json:"value"`
-        Primary bool   `json:"primary"`
-    }{
-        {
-            Value:   event.Email,
-            Primary: true,
-        },
-    }
+// function for creating an AWS user account from an scim.User object.
+func CreateUser(scimURL, bearerToken string, user scim.User) scim.User {
+	returnuser := scim.User{}
+	jsonbody, _ := json.Marshal(user)
+	req, err := http.NewRequest("POST", scimURL, bytes.NewBuffer(jsonbody))
+	if err != nil {
+		log.Println(string(jsonbody))
+		log.Println(req)
+		return scim.User{}
+	}
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Authorization", "Bearer "+bearerToken)
 
-    userJSON, err := json.Marshal(user)
-    if err != nil {
-        return "", fmt.Errorf("failed to marshal user: %v", err)
-    }
-
-    req, err := http.NewRequest("POST", scimURL, bytes.NewBuffer(userJSON))
-    if err != nil {
-        return "", fmt.Errorf("failed to create request: %v", err)
-    }
-    req.Header.Set("Content-Type", "application/json")
-    req.Header.Set("Authorization", bearerToken)
-
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    if err != nil {
-        return "", fmt.Errorf("failed to send request: %v", err)
-    }
-    defer resp.Body.Close()
-
-    body, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        return "", fmt.Errorf("failed to read response body: %v", err)
-    }
-
-    if resp.StatusCode != http.StatusCreated {
-        return "", fmt.Errorf("failed to create user, status: %d, response: %s", resp.StatusCode, string(body))
-    }
-
-    return "User created successfully", nil
+	res, err := http.DefaultClient.Do(req)
+	if res.StatusCode != 201 {
+		log.Println(string(jsonbody))
+		log.Printf("ERROR: AWS Returned HTTP Status Code %d", res.StatusCode)
+		log.Println(res)
+		return scim.User{}
+	}
+	log.Println(res)
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		log.Println("AWS User" + user.UserName + "with mail:" + user.Emails[0].Value + " created")
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	log.Println(res)
+	log.Println(string(body))
+	json.Unmarshal(body, &returnuser)
+	return returnuser
 }
 
 func deleteUser(scimURL, bearerToken, email string) (string, error) {
@@ -230,6 +183,52 @@ func getSecret(secretArn, key string) (string, error) {
 
 func getRegion() string {
 	return os.Getenv("AWS_REGION")
+}
+
+// Map Personio Event to SCIM user
+// TODO This untested Mapping function was written under the assumption that the event received does not differ much from the personio API
+func MapPersonioToSCIM(event personio.Event) scim.User {
+	return scim.User{
+		ID:        employee.ID.Value,
+		ExternalID: "", // TODO Assuming external ID isn't provided by Personio, maybe employee.ID?
+		UserName:  employee.Email.Value, // Using email as the username
+		Name: Name{
+			Formatted:  employee.FirstName.Value + " " + employee.LastName.Value,
+			FamilyName: employee.LastName.Value,
+			GivenName:  employee.FirstName.Value,
+		},
+		DisplayName: employee.FirstName.Value + " " + employee.LastName.Value,
+		Emails: []Email{
+			{
+				Value:   employee.Email.Value,
+				Type:    "work",
+				Primary: true,
+			},
+		},
+		PhoneNumbers: nil,
+		Title:        employee.Position.Value,
+		Department:   employee.Department.Value.Attributes.Name,
+		Organization: employee.Subcompany.Value.Attributes.Name,
+		Active:       employee.Status.Value == "active",
+		UrnIetfParamsScimSchemasExtensionEnterprise21User: &UIPSSEE21U{
+			EmployeeNumber: employee.ID.Value,
+			Department:     employee.Department.Value.Attributes.Name,
+			Manager: struct {
+				Value string `json:"value,omitempty"`
+				Ref   string `json:"$ref,omitempty"`
+			}{
+				Value: employee.Supervisor.Value.Attributes.ID.Value,
+				Ref:   "",
+			},
+		},
+		Meta: []Meta{
+			{
+				ResourceType: "User",
+				Created:      employee.CreatedAt.Value,
+				LastModified: employee.LastModifiedAt.Value,
+			},
+		},
+	}
 }
 
 func main() {
