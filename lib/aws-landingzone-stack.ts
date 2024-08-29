@@ -11,7 +11,6 @@ import { OidcProvider } from './oidc-provider'
 import { GithubCicdRole } from './identities'
 import { DataAiTeam } from './data-ai-team'
 
-
 export class AwsLandingzoneStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props)
@@ -88,6 +87,8 @@ export class AwsLandingzoneStack extends cdk.Stack {
         '99672b9ab3-8f3cbe6e-9933-4271-af13-64d5eab85f88',
         '99672b9ab3-59c6547b-3876-4f85-8402-5ac57a9d4398',
         'f35428f2-c0d1-7012-b959-252b35191e84',
+        'c3245882-60d1-70f0-43ba-d2409656a0ca',
+        '99672b9ab3-324c3529-ea23-4a76-8471-b04e433ed41a',
       ],
       ssoId: ssoId.value,
       identityStoreId: identityStoreId.value,
@@ -111,22 +112,5 @@ export class AwsLandingzoneStack extends cdk.Stack {
       email: 'databricks-poc@pexon-consulting.de',
       organizationalUnit: pexonConsultingOu,
     })
-
-    // Has to be filled manually afterwards, expected keys are 'token' & 'id'
-    const scimLambdaSecrets = new secretsmanager.Secret(this, 'ScimLambdaSecrets', {
-        secretName: 'personio-scim-lambda-secret',
-    description: 'Secret used for the SCIM bearer token and tenant ID',
-    });
-
-    const lambdaFunction = new lambda.Function(this, 'personio-scim-connector', {
-      runtime: lambda.Runtime.PROVIDED_AL2023,
-      code: lambda.Code.fromAsset('lib/personio-connector-lambda'),
-      handler: 'main',
-      environment: {
-        PERSONIO_SCIM_LAMBDA_SECRETS: scimLambdaSecrets.secretArn,
-        AWS_TENANT_ID: 'kE3bd5b870f-c798-45d1-9b5b-3be0d84fbb8f',
-      },
-    });
-
   }
 }
