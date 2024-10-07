@@ -59,7 +59,7 @@ export class AwsLandingzoneStack extends cdk.Stack {
       accountName: 'nord-neo',
       eMail: 'nord-aws-neo@pexon-consulting.de',
       permissionSet,
-      userIds: ['83342872-0051-705e-47bb-bb4df9b05df8', '99672b9ab3-59c6547b-3876-4f85-8402-5ac57a9d4398'],
+      userIds: ['83342872-0051-705e-47bb-bb4df9b05df8', '99672b9ab3-59c6547b-3876-4f85-8402-5ac57a9d4398', 'c3c42872-a0d1-700b-8295-2ef00c6a7280'],
       ssoId: ssoId.value,
       identityStoreId: identityStoreId.value,
     })
