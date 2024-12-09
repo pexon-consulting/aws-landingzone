@@ -90,7 +90,8 @@ export class AwsLandingzoneStack extends cdk.Stack {
         'c3245882-60d1-70f0-43ba-d2409656a0ca',
         '99672b9ab3-324c3529-ea23-4a76-8471-b04e433ed41a',
         '4364c8e2-c061-70b5-8635-5c6a3f11b9c4',
-        '99672b9ab3-03e14aee-17cc-48c6-b419-64053cce8546'
+        '99672b9ab3-03e14aee-17cc-48c6-b419-64053cce8546',
+        'b3f4b8c2-e041-701e-acc7-36345df78d23'
       ],
       ssoId: ssoId.value,
       identityStoreId: identityStoreId.value,
