@@ -63,6 +63,16 @@ export class AwsLandingzoneStack extends cdk.Stack {
       ssoId: ssoId.value,
       identityStoreId: identityStoreId.value,
     })
+    new AwsTeamAccountNestedStack(this, 'ou-louisen-lund', {
+      ouAwsTeams,
+      teamName: 'louisen-lund',
+      accountName: 'louisen-lund',
+      eMail: 'louisen-lund@pexon-consulting.de',
+      permissionSet,
+      userIds: ['99672b9ab3-e7f58c1d-ec7c-4515-832d-dfd49b213591'],
+      ssoId: ssoId.value,
+      identityStoreId: identityStoreId.value,
+    })    
     new AwsTeamAccountNestedStack(this, 'ou-team-sued-sora', {
       ouAwsTeams,
       teamName: 'sued-sora',
@@ -107,12 +117,6 @@ export class AwsLandingzoneStack extends cdk.Stack {
     new Account(this, 'account-pexonconsulting', {
       accountName: 'pexonconsulting',
       email: 'EMEA.CTA.payer507@aws.tdsynnex.com',
-      organizationalUnit: pexonConsultingOu,
-    })
-
-    new Account(this, 'louisenlund', {
-      accountName: 'louisenlund',
-      email: 'louisenlund@pexon-consulting.de',
       organizationalUnit: pexonConsultingOu,
     })
     
