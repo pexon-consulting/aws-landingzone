@@ -96,17 +96,6 @@ export class AwsLandingzoneStack extends cdk.Stack {
       ssoId: ssoId.value,
       identityStoreId: identityStoreId.value,
     })
-
-    new AwsTeamAccountNestedStack(this, 'ou-louisenlund', {
-      ouAwsTeams,
-      teamName: 'louisenlund',
-      accountName: 'ou-louisenlund',
-      eMail: 'louisenlund@pexon-consulting.de',
-      permissionSet,
-      userIds: ['99672b9ab3-e7f58c1d-ec7c-4515-832d-dfd49b213591'],
-      ssoId: ssoId.value,
-      identityStoreId: identityStoreId.value,
-    })
     
     new DataAiTeam(this, 'data-ai-team', {
       rootId,
@@ -121,6 +110,12 @@ export class AwsLandingzoneStack extends cdk.Stack {
       organizationalUnit: pexonConsultingOu,
     })
 
+    new Account(this, 'louisenlund', {
+      accountName: 'louisenlund',
+      email: 'louisenlund@pexon-consulting.de',
+      organizationalUnit: pexonConsultingOu,
+    })
+    
     new Account(this, 'account-databricks-poc', {
       accountName: 'databricks-poc',
       email: 'databricks-poc@pexon-consulting.de',
