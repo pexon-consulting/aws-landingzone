@@ -97,11 +97,11 @@ export class AwsLandingzoneStack extends cdk.Stack {
       identityStoreId: identityStoreId.value,
     })
 
-    new AwsTeamAccountNestedStack(this, 'Louisenlund', {
+    new AwsTeamAccountNestedStack(this, 'ou-louisenlund', {
       ouAwsTeams,
-      teamName: 'Louisenlund',
-      accountName: 'Louisenlund',
-      eMail: 'Louisenlund@pexon-consulting.de',
+      teamName: 'louisenlund',
+      accountName: 'ou-louisenlund',
+      eMail: 'louisenlund@pexon-consulting.de',
       permissionSet,
       userIds: ['99672b9ab3-e7f58c1d-ec7c-4515-832d-dfd49b213591'],
       ssoId: ssoId.value,
