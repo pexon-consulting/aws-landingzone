@@ -2,14 +2,13 @@ import * as cdk from 'aws-cdk-lib'
 import { Construct } from 'constructs'
 
 import * as sso from 'aws-cdk-lib/aws-sso'
-import * as lambda from 'aws-cdk-lib/aws-lambda'
-import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager'
 import * as organizations from 'aws-cdk-lib/aws-organizations'
-import { Account, OrganizationalUnit, OrganizationsScpPolicy, SsmParameterString } from './constructs'
+import { Account, OrganizationalUnit, SsmParameterString } from './constructs'
 import { AwsTeamAccountNestedStack } from './aws-team-accounts'
 import { OidcProvider } from './oidc-provider'
 import { GithubCicdRole } from './identities'
 import { DataAiTeam } from './data-ai-team'
+import { AwsCustomerAccountNestedStack } from './aws-customer-account'
 
 export class AwsLandingzoneStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -36,12 +35,19 @@ export class AwsLandingzoneStack extends cdk.Stack {
       parentId: rootId,
     })
 
+    const ouAwsCustomer = new OrganizationalUnit(this, 'ou-aws-customer', {
+      name: 'OU - AWS Customer',
+      parentId: rootId,
+    })
+
     const permissionSet = new sso.CfnPermissionSet(this, 'team-administrator-access-permission-set', {
       instanceArn: `arn:aws:sso:::instance/${ssoId.value}`,
       name: 'Cloud-Team-AdministratorAccess',
       sessionDuration: 'PT1H',
       managedPolicies: ['arn:aws:iam::aws:policy/AdministratorAccess'],
     })
+
+    // Team-Accounts
 
     new AwsTeamAccountNestedStack(this, 'ou-team-west-vader', {
       ouAwsTeams,
@@ -59,20 +65,14 @@ export class AwsLandingzoneStack extends cdk.Stack {
       accountName: 'nord-neo',
       eMail: 'nord-aws-neo@pexon-consulting.de',
       permissionSet,
-      userIds: ['83342872-0051-705e-47bb-bb4df9b05df8', '99672b9ab3-59c6547b-3876-4f85-8402-5ac57a9d4398', 'c3c42872-a0d1-700b-8295-2ef00c6a7280'],
+      userIds: [
+        '83342872-0051-705e-47bb-bb4df9b05df8',
+        '99672b9ab3-59c6547b-3876-4f85-8402-5ac57a9d4398',
+        'c3c42872-a0d1-700b-8295-2ef00c6a7280',
+      ],
       ssoId: ssoId.value,
       identityStoreId: identityStoreId.value,
     })
-    new AwsTeamAccountNestedStack(this, 'ou-louisen-lund', {
-      ouAwsTeams,
-      teamName: 'louisen-lund',
-      accountName: 'louisen-lund',
-      eMail: 'louisen-lund@pexon-consulting.de',
-      permissionSet,
-      userIds: ['99672b9ab3-e7f58c1d-ec7c-4515-832d-dfd49b213591'],
-      ssoId: ssoId.value,
-      identityStoreId: identityStoreId.value,
-    })    
     new AwsTeamAccountNestedStack(this, 'ou-team-sued-sora', {
       ouAwsTeams,
       teamName: 'sued-sora',
@@ -101,12 +101,26 @@ export class AwsLandingzoneStack extends cdk.Stack {
         '99672b9ab3-324c3529-ea23-4a76-8471-b04e433ed41a',
         '4364c8e2-c061-70b5-8635-5c6a3f11b9c4',
         '99672b9ab3-03e14aee-17cc-48c6-b419-64053cce8546',
-        'b3f4b8c2-e041-701e-acc7-36345df78d23'
+        'b3f4b8c2-e041-701e-acc7-36345df78d23',
       ],
       ssoId: ssoId.value,
       identityStoreId: identityStoreId.value,
     })
-    
+
+    // Customer-Accounts
+
+    new AwsCustomerAccountNestedStack(this, 'louisenlund', {
+      organizationalUnit: ouAwsCustomer,
+      customerName: 'louisenlund',
+      eMail: 'louisenlund@pexon-consulting.de',
+      permissionSet,
+      userIds: ['99672b9ab3-e7f58c1d-ec7c-4515-832d-dfd49b213591'],
+      ssoId: ssoId.value,
+      identityStoreId: identityStoreId.value,
+    })
+
+    // special-Accounts
+
     new DataAiTeam(this, 'data-ai-team', {
       rootId,
       identityStoreId: identityStoreId.value,
@@ -117,12 +131,6 @@ export class AwsLandingzoneStack extends cdk.Stack {
     new Account(this, 'account-pexonconsulting', {
       accountName: 'pexonconsulting',
       email: 'EMEA.CTA.payer507@aws.tdsynnex.com',
-      organizationalUnit: pexonConsultingOu,
-    })
-    
-    new Account(this, 'account-databricks-poc', {
-      accountName: 'databricks-poc',
-      email: 'databricks-poc@pexon-consulting.de',
       organizationalUnit: pexonConsultingOu,
     })
   }
